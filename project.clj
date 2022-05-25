@@ -19,6 +19,11 @@
                  [aysylu/loom "1.0.2"]
                  ]
 
+  :deploy-repositories [["clojars" {:sign-releases false
+                                    :url           "https://clojars.org/repo"
+                                    :username      :env/CLOJARS_USERNAME
+                                    :password      :env/CLOJARS_TOKEN}]]
+
   :plugins [[fi.polycode/lein-git-revisions "1.0.0"]
             [lein-ancient "1.0.0-RC3"]
             [nvd-clojure "2.2.0"]]
