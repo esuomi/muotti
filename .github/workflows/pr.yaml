@@ -1,0 +1,33 @@
+name: Verify Pull Request
+
+on:
+  pull_request:
+    branches:
+      - master
+
+env:
+  LEIN_USE_BOOTCLASSPATH: no
+
+jobs:
+  clojure:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - name: Prepare java
+        uses: actions/setup-java@v2
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Install clojure tools
+        uses: DeLaGuardo/setup-clojure@3.7
+        with:
+          lein: latest
+
+      - name: Run Unit tests
+        run: lein test
