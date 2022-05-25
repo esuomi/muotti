@@ -1,8 +1,10 @@
-(defproject muotti "_"
-  :description "FIXME: write description"
-  :url "http://example.com/FIXME"
-  :license {:name "Eclipse Public License"
-            :url  "http://www.eclipse.org/legal/epl-v10.html"}
+(defproject fi.polycode/muotti "_"
+  :description "Muotti is a graph based value transformer library which aims to solve value transformation by utilizing
+                a digraph of known transformations to produce a transformer chain which is then used to perform the
+                actual transformation."
+  :url "https://github.com/esuomi/muotti"
+  :license {:name "EPL-2.0 OR GPL-2.0-or-later WITH Classpath-exception-2.0"
+            :url "https://www.eclipse.org/legal/epl-2.0/"}
 
   :dependencies [[org.clojure/clojure "1.11.0"]
 
@@ -13,11 +15,8 @@
                  [io.aviso/pretty "1.1.1"]                  ; pretty exceptions
                  [mvxcvi/puget "1.3.2"]                     ; pretty everything else
 
-                 [metosin/malli "0.8.4"]
-                 [org.babashka/sci "0.3.5"]
-
-                 ; rich type helper libraries
-                 [lambdaisland/uri "1.13.95"]
+                 ;Graph library for Clojure. Eclipse Public License 1.0
+                 [aysylu/loom "1.0.2"]
                  ]
 
   :plugins [[fi.polycode/lein-git-revisions "1.0.0"]
@@ -51,4 +50,4 @@
 
   :git-revisions {:format        :semver
                   :adjust        [:env/project_revision_adjustment :minor]
-                  :revision-file "resources/metadata.edn"})
+                  :revision-file "src/main/resources/metadata.edn"})
