@@ -9,6 +9,11 @@
 
 <sup>(_source: https://en.wiktionary.org/wiki/muotti_)</sup>
 
+[![Deploy to Clojars](https://github.com/esuomi/muotti/actions/workflows/deploy.yaml/badge.svg)](https://github.com/esuomi/muotti/actions/workflows/deploy.yaml)
+[![Clojars Project](https://img.shields.io/clojars/v/fi.polycode/muotti.svg)](https://clojars.org/fi.polycode/muotti)
+[![cljdoc badge](https://cljdoc.org/badge/fi.polycode/muotti)](https://cljdoc.org/jump/release/fi.polycode/muotti)
+
+
 Muotti is a graph based value transformer library which aims
 to solve value transformation by utilizing a [digraph](https://en.wikipedia.org/wiki/Directed_graph) of known
 transformations to produce a _transformer chain_ which is then used to perform the actual transformation.
