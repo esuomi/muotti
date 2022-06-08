@@ -57,7 +57,6 @@
     If value cannot be transformed with the resolved chain, special value `::invalid-value` is returned."))
 
 ; TODO: logging, better chain debugging, malli walks
-; TODO: from and to cannot be same
 
 (defn ->transformer
   "Creates a new [[Transformer]] instance from given map of adjacencies and related configuration. By default uses
@@ -83,8 +82,11 @@
              chain
              (reduce
                (fn [v {:keys [validator transformer]}]
-                 (if (validator v)
+                 (if (boolean ((or validator identity) v))
+                   ; TODO: logging/exception handling for actual transformation
                    (transformer v)
-                   (reduced ::invalid-value)))
+                   (do
+                     (log/warnf "Value '%s' cannot be validated with the user provided validator %s" v validator)
+                     (reduced ::invalid-value))))
                value
                chain))))))))
