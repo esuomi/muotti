@@ -29,7 +29,8 @@
 
   :plugins [[fi.polycode/lein-git-revisions "1.0.0"]
             [lein-ancient "1.0.0-RC3"]
-            [nvd-clojure "2.2.0"]]
+            [nvd-clojure "2.2.0"]
+            [lein-pprint "1.3.2"]]
 
   :jvm-opts ["-Dclojure.tools.logging.factory=clojure.tools.logging.impl/slf4j-factory"]
   :global-vars {*warn-on-reflection* true}
