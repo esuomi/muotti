@@ -106,3 +106,4 @@ which results in
 ## TODO
 
  - [ ] `:muotti/default` - allow Malli transformer to inject a default value for `nil` values
+ - [ ] more comprehensive Malli schema registry support, currently just the basics are covered
