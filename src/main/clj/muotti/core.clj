@@ -21,13 +21,13 @@
   (let [path (alg/bf-path graph from to)]
     (if (some? path)
       (do
-        (log/debugf "Resolved path '%s -> %s' as %s" from to path)
+        (log/debugf "Resolved transformation [%s -> %s] as path %s" from to path)
         (->> (partition 2 1 path)
              (map (fn [[from to]]
                     (attr/attrs graph from to)))
              (filter some?)))
       (do
-        (log/warnf "Path '%s -> %s' cannot be resolved with given adjancency list" from to)
+        (log/warnf "Transformation [%s -> %s] cannot be resolved with given adjancency list" from to)
         ::unknown-path))))
 
 (def default-config
@@ -82,7 +82,6 @@
              chain
              (reduce
                (fn [v {:keys [validator transformer]}]
-                 (log/tracef "Processing %s -> %s" v (transformer v))
                  (if (if (some? validator)
                        (validator v)
                        true)

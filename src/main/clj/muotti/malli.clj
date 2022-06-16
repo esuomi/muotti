@@ -68,17 +68,17 @@
 
       (if (true? ignore?)
         (do
-          (log/tracef "%s ignored" (log-context))
+          (log/debugf "%s ignored" (log-context))
           x)
         (if-not (some #{target-type} supported-types)                ; TODO: better detection for target schema type support
           (do
-            (log/tracef "%s not supported: unsupported target type" (log-context))
+            (log/warnf "%s not supported: unsupported target type" (log-context))
             x)
           (if (and (keyword? (-> target-type))
                    (not= source-type target-type)
                    (and (not= ::unsupported source-type)
                         (not= ::unsupported target-type)))
-            (do (log/debugf "%s supported" (log-context))
+            (do (log/infof "%s supported" (log-context))
                 (muotti/transform transformer source-type target-type x))
             x))))))
 
