@@ -2,6 +2,7 @@
   (:require [loom.alg :as alg]
             [loom.attr :as attr]
             [loom.graph :as graph]
+            [loom.io :as lio]
             [clojure.tools.logging :as log]))
 
 (defn ^:private adjacencies-as-graph
@@ -54,7 +55,9 @@
     known but must be resolvable into a transformation chain.
 
     If path between the types is not found, special value `::unknown-path` is returned.
-    If value cannot be transformed with the resolved chain, special value `::invalid-value` is returned."))
+    If value cannot be transformed with the resolved chain, special value `::invalid-value` is returned.")
+  (graph-dot [this]
+    "Render the contained graph out as DOT document. Returns the result as string."))
 
 ; TODO: logging, better chain debugging, malli walks
 
@@ -91,6 +94,8 @@
                      (log/warnf "Value %s cannot be validated with the user provided validator %s" v validator)
                      (reduced ::invalid-value))))
                value
-               chain))))))))
+               chain))))
+       (graph-dot [_]
+         (lio/dot-str graph))))))
 
 ; TODO: When logging value v, wrap with check that allows hiding it from logs, eg. :muotti/guard

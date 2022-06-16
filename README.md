@@ -87,6 +87,22 @@ The following transformations are pre-defined in the `muotti.malli/malli-config`
 
 ![Malli native types and supported transformations](./docs/images/muotti_malli_transformations.png)
 
+## [DOT/GraphViz](https://graphviz.org/) support
+
+It is possible to output the graph contained by the transformer as DOT:
+```clojure
+(->> (muotti/->transformer mm/malli-config)
+     (muotti/graph-dot)
+     (spit "/tmp/graph.dot"))
+```
+The resulting file can be input into [GraphViz](https://graphviz.org/):
+```shell
+dot -Tpng /tmp/graph.dot > graph.png
+```
+which results in
+
+![DOT example output](./docs/images/dot_example_output.png)
+
 ## TODO
 
  - [ ] `:muotti/default` - allow Malli transformer to inject a default value for `nil` values
