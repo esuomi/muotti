@@ -11,10 +11,11 @@
   (reduce
     (fn [g [link attrs]]
       (reduce
-        (fn [g [k v]] (attr/add-attr-to-edges g k v [link]))
+        (fn [g [k v]]
+          (attr/add-attr-to-edges g k v [link]))
         g
         attrs))
-    (apply graph/digraph(keys adjacencies))
+    (apply graph/digraph (keys adjacencies))
     adjacencies))
 
 (defn ^:private resolve-transformer-chain

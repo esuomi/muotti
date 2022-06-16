@@ -43,8 +43,8 @@ which is then immediately usable for transforming values:
 ```clojure
 (muotti/transform t :keyword :number :123)
 ; => 123
-(muotti/transform t :number :keyword 123)
-; => :123
+(muotti/transform t :number :boolean 123)
+; => true  ;; non-empty values are treated as ´true´ by clojure.core/boolean
 ```
 
 Unresolvable transformations return a special value:
@@ -55,8 +55,8 @@ Unresolvable transformations return a special value:
 
 Transformer chain validation errors also return a special value:
 ```clojure
-(def broken-adjacency {[:a :b] {:validator   keyword?
-                                :transformer str}})
+(def broken-adjacency {:transformations {[:a :b] {:validator   keyword?
+                                                  :transformer str}}})
 (def t2 (muotti/->transformer broken-adjacency))
 (muotti/transform t2 :a :b "not a number")
 ;; => ::invalid-value
@@ -69,6 +69,7 @@ capability.
 
 Create a Malli transformer and then use it to call eg. `malli.core/decode` with the transformer:
 ```clojure
+(require '[malli.core :as malli])
 (require '[muotti.malli :as mm])
 
 (malli/decode
