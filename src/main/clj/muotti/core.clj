@@ -18,7 +18,7 @@
 
 (defn ^:private resolve-transformer-chain
   [graph from to]
-  (let [path  (alg/bf-path graph from to)]
+  (let [path (alg/bf-path graph from to)]
     (if (some? path)
       (do
         (log/debugf "Resolved path '%s -> %s' as %s" from to path)
@@ -82,11 +82,16 @@
              chain
              (reduce
                (fn [v {:keys [validator transformer]}]
-                 (if (boolean ((or validator identity) v))
+                 (log/tracef "Processing %s -> %s" v (transformer v))
+                 (if (if (some? validator)
+                       (validator v)
+                       true)
                    ; TODO: logging/exception handling for actual transformation
                    (transformer v)
                    (do
-                     (log/warnf "Value '%s' cannot be validated with the user provided validator %s" v validator)
+                     (log/warnf "Value %s cannot be validated with the user provided validator %s" v validator)
                      (reduced ::invalid-value))))
                value
                chain))))))))
+
+; TODO: When logging value v, wrap with check that allows hiding it from logs, eg. :muotti/guard

@@ -1,5 +1,8 @@
 (ns muotti.dev
-  (:require [muotti.core :refer :all]))
+  (:require [malli.core :as malli]
+            [malli.transform :as mt]
+            [muotti.core :refer :all]
+            [muotti.malli :as mm]))
 
 (def adjacencies {[:keyword :string]  {:validator   keyword?
                                        :transformer name}
@@ -14,3 +17,13 @@
                   [:number :boolean]  {:validator   number?
                                        :transformer boolean}})
 
+#_((malli/decoder
+   [:map
+    [:x [:set [:enum {:muotti/default "S"} "S" "L"]]]
+    [:y {:muotti/ignore true} :uuid]
+    [:z [:tuple :boolean [:map [:a :int]]]]]
+   (mm/transformer (->transformer mm/malli-config)))
+ {:x #{"S" "L" "XL" nil}
+  :y :invalid
+  :z [true {:a 123}]})
+; TODO: document :validator being optional

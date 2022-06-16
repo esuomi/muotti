@@ -17,7 +17,10 @@
 
                  ;Graph library for Clojure. Eclipse Public License 1.0
                  [aysylu/loom "1.0.2"]
-                 ]
+
+                 ; all muotti extensions are optional
+                 [borkdude/dynaload "0.2.2"]
+                 [metosin/malli "0.8.4" :scope "provided"]]
 
   :deploy-repositories [["clojars" {:sign-releases false
                                     :url           "https://clojars.org/repo"
