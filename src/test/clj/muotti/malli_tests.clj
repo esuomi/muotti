@@ -66,5 +66,9 @@
     (testing "malli.core/predicate-schemas"
 
       ; any?, some?, number?, integer?, int?, pos-int?, neg-int?, nat-int?, pos?, neg?, float?, double?, boolean?, string?, ident?, simple-ident?, qualified-ident?, keyword?, simple-keyword?, qualified-keyword?, symbol?, simple-symbol?, qualified-symbol?, uuid?, uri?, decimal?, inst?, seqable?, indexed?, map?, vector?, list?, seq?, char?, set?, nil?, false?, true?, zero?, rational?, coll?, empty?, associative?, sequential?, ratio?, bytes?, ifn? and fn?
-      ))
-  )
+      )))
+
+(deftest default-values
+  (let [tf (create-transformer mm/malli-config)]
+    (testing "provided default value is used for nil inputs"
+      (assert-decoding "nil -> [:string {:muotti/default \"hello\"] -> hello" tf [:string {:muotti/default "hello"}] nil "hello"))))
