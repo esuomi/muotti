@@ -56,31 +56,35 @@
     (log/tracef "Value %s seems to be of type %s" v assumed-type)
     assumed-type))
 
-(defmulti schema-matcher #(malli/-type %))
-
 (defn ^:private converter
   [transformer from-fn to-fn props]
   (fn [x]
     (let [source-type (from-fn x)
           target-type (to-fn x)
-          ignore? (some-> props :muotti/ignore)
+          ignore?     (some-> props :muotti/ignore)
+          default     (some-> props :muotti/default)
           log-context (fn [] (format "[%s -> %s] conversion of %s" source-type target-type x))]
+        (cond
+          ignore?
+          (do (log/debugf "%s ignored" (log-context))
+              x)
 
-      (if (true? ignore?)
-        (do
-          (log/debugf "%s ignored" (log-context))
-          x)
-        (if-not (some #{target-type} supported-types)                ; TODO: better detection for target schema type support
-          (do
-            (log/warnf "%s not supported: unsupported target type" (log-context))
-            x)
-          (if (and (keyword? (-> target-type))
-                   (not= source-type target-type)
-                   (and (not= ::unsupported source-type)
-                        (not= ::unsupported target-type)))
-            (do (log/infof "%s supported" (log-context))
-                (muotti/transform transformer source-type target-type x))
-            x))))))
+          (and (nil? x) (some? default))
+          (do (log/infof "%s not supported: returning provided default %s" (log-context) default)
+              default)
+
+          (not (some #{target-type} supported-types))
+          (do (log/warnf "%s not supported: unsupported target type" (log-context))
+              x)
+
+          (and (keyword? (-> target-type))
+               (not= source-type target-type)
+               (and (not= ::unsupported source-type)
+                    (not= ::unsupported target-type)))
+          (do (log/infof "%s supported" (log-context))
+              (muotti/transform transformer source-type target-type x))
+
+          :else x))))
 
 (defn ^:private ->malli-xformer
   [muotti-transformer from-fn to-fn]
