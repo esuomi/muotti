@@ -6,7 +6,7 @@
 
 (defn ^:private create-transformer
   [config]
-  (let [muotti-xformer (muotti/->transformer mm/malli-config)
+  (let [muotti-xformer (muotti/->transformer config)
         malli-xformer  (mm/transformer muotti-xformer)]
     malli-xformer))
 
@@ -72,3 +72,12 @@
   (let [tf (create-transformer mm/malli-config)]
     (testing "provided default value is used for nil inputs"
       (assert-decoding "nil -> [:string {:muotti/default \"hello\"] -> hello" tf [:string {:muotti/default "hello"}] nil "hello"))))
+
+(deftest override-types
+  (let [tf (create-transformer {:transformations {[:override/source :string] {:transformer (constantly "overridden from")}
+                                                  [:string :override/target] {:transformer (constantly "overridden to")}}})]
+    (testing "source type can be overridden"
+      (assert-decoding ":override/source -> :string" tf [:string {:muotti/source :override/source}] "value" "overridden from"))
+
+    (testing "target type can be overridden"
+      (assert-decoding ":string -> :override/target" tf [:string {:muotti/target :override/target}] "value" "overridden to"))))

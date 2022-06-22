@@ -38,8 +38,6 @@
                                      [:int pos?]                  {:transformer identity}
                                      [:double pos?]               {:transformer identity}}})
 
-(def supported-types (->> malli-config :transformations keys flatten set))
-
 (defn ^:private detect-type
   [_ v]
   (let [assumed-type (cond
@@ -57,10 +55,10 @@
     assumed-type))
 
 (defn ^:private converter
-  [transformer from-fn to-fn props]
+  [transformer from-fn to-fn props supported-types]
   (fn [x]
-    (let [source-type (from-fn x)
-          target-type (to-fn x)
+    (let [source-type (or (some-> props :muotti/source) (from-fn x))
+          target-type (or (some-> props :muotti/target) (to-fn x))
           ignore?     (some-> props :muotti/ignore)
           default     (some-> props :muotti/default)
           log-context (fn [] (format "[%s -> %s] conversion of %s" source-type target-type x))]
@@ -74,7 +72,7 @@
               default)
 
           (not (some #{target-type} supported-types))
-          (do (log/warnf "%s not supported: unsupported target type" (log-context))
+          (do (log/warnf "%s not supported: unsupported target type, supported %s" (log-context) supported-types)
               x)
 
           (and (keyword? (-> target-type))
@@ -93,13 +91,14 @@
       muotti-transformer
       (partial from-fn schema)
       (partial to-fn schema)
-      (malli/-properties schema))))
+      (malli/-properties schema)
+      (->> (muotti/config muotti-transformer) :transformations keys flatten set))))
 
 (defn transformer
   ([muotti-transformer]
    (transformer muotti-transformer muotti-transformer))
   ([muotti-decoder muotti-encoder]
-   (letfn [(from-schema [schema _] (println "resolving schema to malli form") (malli/-form schema))]
+   (letfn [(from-schema [schema _] (some-> schema (malli/-parent) (malli/-type)))]
      (mt/transformer
        {:name            :muotti
         :default-decoder {:compile (->malli-xformer muotti-decoder detect-type from-schema)}
