@@ -58,7 +58,9 @@
     If path between the types is not found, special value `::unknown-path` is returned.
     If value cannot be transformed with the resolved chain, special value `::invalid-value` is returned.")
   (graph-dot [this]
-    "Render the contained graph out as DOT document. Returns the result as string."))
+    "Render the contained graph out as DOT document. Returns the result as string.")
+  (config [this]
+    "Return the original configuration this transformer was created with."))
 
 ; TODO: logging, better chain debugging, malli walks
 
@@ -77,7 +79,8 @@
                                                                       :transformer parse-long}})
   ```"
   ([] ->transformer default-config)
-  ([{:keys [transformations]}]
+  ([{:keys [transformations]
+     :as   config}]
    (let [graph (adjacencies-as-graph transformations)]
      (reify Transformer
        (transform [_ from to value]
@@ -97,6 +100,8 @@
                value
                chain))))
        (graph-dot [_]
-         (lio/dot-str graph))))))
+         (lio/dot-str graph))
+       (config [_]
+         config)))))
 
 ; TODO: When logging value v, wrap with check that allows hiding it from logs, eg. :muotti/guard
