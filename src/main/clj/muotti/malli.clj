@@ -85,8 +85,6 @@
 (defn ^:private ->malli-xformer
   [muotti-transformer from-fn to-fn]
   (fn [schema _options]
-    (println (str "<<< " (pr-str schema) " / " (malli/-properties schema)))
-    (println (str "<<< " _options))
     (converter
       muotti-transformer
       (partial from-fn schema)
