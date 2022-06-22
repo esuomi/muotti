@@ -72,14 +72,34 @@ Create a Malli transformer and then use it to call eg. `malli.core/decode` with 
 (require '[malli.core :as malli])
 (require '[muotti.malli :as mm])
 
+(def malli-transformer (mm/transformer (muotti/->transformer mm/malli-config)))
+
 (malli/decode
   [:map
    [:a {:muotti/ignore true} :uuid]
    [:b :int]]
   {:a :invalid
    :b "123"}
-  (mm/transformer (muotti/->transformer mm/malli-config)))
+  malli-transformer)
 ;;=> {:a nil, :b 123}
+```
+
+### Override source and target types
+
+Use `:muotti/source` and `:muotti/target` properties to override transformation types.
+
+See [muotti.malli-tests/override-types](./src/test/clj/muotti/malli_tests.clj#L76) for examples.
+
+### Provide default value for `nil` inputs
+
+Use `:muotti/default` to provide a default value.
+
+```clojure
+(malli/decode
+  [:string {:muotti/default "hello"}]
+  nil
+  malli-transformer)
+;;=> hello
 ```
 
 ### Supported transformations
