@@ -132,7 +132,7 @@ Muotti's aim is to support all major Malli types and predicates which are too nu
 It is possible to output the graph contained by the transformer as DOT:
 ```clojure
 (->> (muotti/->transformer mm/malli-config)
-     (muotti/graph-dot)
+     (muotti/visualize-dot)
      (spit "/tmp/graph.dot"))
 ```
 The resulting file can be input into [GraphViz](https://graphviz.org/):

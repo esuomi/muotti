@@ -153,7 +153,7 @@
   "Convert function names to symbols."
   [maybe-fns]
 
-  (map (fn [v] (if (fn? v) (-> (get-meta v) :name) v)) maybe-fns))
+  (map (fn [v] (if (fn? v) (:name (get-meta v)) v)) maybe-fns))
 ; TODO: Ei toimi, tsekkaa REPL-sessio
 ; https://stackoverflow.com/a/12433266/44523
 ; (symbol (name (quote pos?)))
@@ -190,8 +190,7 @@
                              {:type            (:muotti/type opts)
                               :pred            #(instance? (:class opts) %)
                               :type-properties {:error/fn (fn [error _] (str "Expected value to be " type ", was " (:value error) " instead"))}}))
-        custom-predicates (-> {}
-                              (register-pred #'instance? instance?-schema))]
+        custom-predicates (register-pred {} #'instance? instance?-schema)]
     (mr/composite-registry
       base-registry
       custom-predicates
