@@ -20,7 +20,7 @@
 
                  ; all muotti extensions are optional
                  [borkdude/dynaload "0.2.2"]
-                 [metosin/malli "0.8.4" :scope "provided"]]
+                 [metosin/malli "0.8.9" :scope "provided"]]
 
   :deploy-repositories [["clojars" {:sign-releases false
                                     :url           "https://clojars.org/repo"
@@ -30,7 +30,8 @@
   :plugins [[fi.polycode/lein-git-revisions "1.0.0"]
             [lein-ancient "1.0.0-RC3"]
             [nvd-clojure "2.2.0"]
-            [lein-pprint "1.3.2"]]
+            [lein-pprint "1.3.2"]
+            [lein-kibit "0.1.8"]]
 
   :jvm-opts ["-Dclojure.tools.logging.factory=clojure.tools.logging.impl/slf4j-factory"]
   :global-vars {*warn-on-reflection* true}

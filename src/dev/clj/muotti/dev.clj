@@ -1,7 +1,7 @@
 (ns muotti.dev
   (:require [malli.core :as malli]
             [malli.transform :as mt]
-            [muotti.core :refer :all]
+            [muotti.core :as muotti]
             [muotti.malli :as mm]))
 
 (def adjacencies {[:keyword :string]  {:validator   keyword?

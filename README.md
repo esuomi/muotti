@@ -62,6 +62,25 @@ Transformer chain validation errors also return a special value:
 ;; => ::invalid-value
 ```
 
+All possible paths in the graph will be tested to resolve a result:
+```clojure
+(def multiple {:transformations {[:in :num] {:transformer #(Integer/parseInt %)}
+                                 [:in :str] {:transformer str}
+                                 [:str :out] {:transformer #(= "magic!" %)}
+                                 [:num :out] {:transformer #(= 6 %)}}})
+(def t3 (muotti/->transformer multiple))
+(muotti/transform t3 :in :out "6")
+;;=> true
+(muotti/transform t3 :in :out "magic!")
+;;=> true
+(muotti/transform t3 :in :out "0")
+;;=> false
+(muotti/transform t3 :in :out "anything")
+;;=> false
+```
+
+> Resolving order of paths is not guaranteed to be stable!
+
 ## [Malli](https://github.com/metosin/malli) integration
 
 Muotti is made to complement Malli's decoding and encoding capabilities through [Malli's Value Transformation](https://github.com/metosin/malli#value-transformation)
@@ -104,9 +123,9 @@ Use `:muotti/default` to provide a default value.
 
 ### Supported transformations
 
-The following transformations are pre-defined in the `muotti.malli/malli-config`.
-
-![Malli native types and supported transformations](./docs/images/muotti_malli_transformations.png)
+Muotti's aim is to support all major Malli types and predicates which are too numerous to list here. Instead see either
+ 1. [`muotti.malli-tests`](src/test/clj/muotti/malli_tests.clj) namespace or
+ 2. The DOT graph below
 
 ## [DOT/GraphViz](https://graphviz.org/) support
 
@@ -122,9 +141,4 @@ dot -Tpng /tmp/graph.dot > graph.png
 ```
 which results in
 
-![DOT example output](./docs/images/dot_example_output.png)
-
-## TODO
-
- - [ ] `:muotti/default` - allow Malli transformer to inject a default value for `nil` values
- - [ ] more comprehensive Malli schema registry support, currently just the basics are covered
+![DOT example output](./docs/images/graph.png)
