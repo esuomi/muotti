@@ -9,8 +9,8 @@
   :dependencies [[org.clojure/clojure "1.11.0"]
 
                  ;Ecosystem friendly logging
-                 [org.slf4j/slf4j-api "1.7.36"]
-                 [ch.qos.logback/logback-classic "1.2.11"]
+                 [org.slf4j/slf4j-api "2.0.2" :scope "provided"]
+                 [ch.qos.logback/logback-classic "1.4.1" :scope "provided"]
                  [org.clojure/tools.logging "1.2.4"]
                  [io.aviso/pretty "1.1.1"]                  ; pretty exceptions
                  [mvxcvi/puget "1.3.2"]                     ; pretty everything else
@@ -19,7 +19,6 @@
                  [aysylu/loom "1.0.2"]
 
                  ; all muotti extensions are optional
-                 [borkdude/dynaload "0.2.2"]
                  [metosin/malli "0.8.9" :scope "provided"]]
 
   :deploy-repositories [["clojars" {:sign-releases false
