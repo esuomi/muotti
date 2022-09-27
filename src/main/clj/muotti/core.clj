@@ -62,12 +62,10 @@
 
     If path between the types is not found, special value `::unknown-path` is returned.
     If value cannot be transformed with the resolved chain, special value `::invalid-value` is returned.")
-  (graph-dot [this]
+  (visualize-dot [this]
     "Render the contained graph out as DOT document. Returns the result as string.")
   (config [this]
     "Return the original configuration this transformer was created with."))
-
-; TODO: logging, better chain debugging, malli walks
 
 (defn ^:private resolve-chain
   [value chain]
@@ -112,16 +110,13 @@
              chains
              (reduce
                (fn [_ chain]
-                 (println "_ = " _)
                  (let [result (resolve-chain value chain)]
                    (if-not (= ::failed-resolve result)
                      (reduced result)
                      ::invalid-value)))
                ::invalid-value
                chains))))
-       (graph-dot [_]
+       (visualize-dot [_]
          (lio/dot-str graph))
        (config [_]
          config)))))
-
-; TODO: When logging value v, wrap with check that allows hiding it from logs, eg. :muotti/guard
