@@ -2,7 +2,9 @@
   (:require [clojure.test :refer :all]
             [malli.core :as malli]
             [muotti.core :as muotti]
-            [muotti.malli :as mm]))
+            [muotti.malli :as mm]
+            [clojure.tools.logging :as log])
+  (:import (java.time Instant)))
 
 (defn ^:private create-transformer
   [config]
@@ -11,9 +13,17 @@
     malli-xformer))
 
 (defn ^:private assert-decoding
-  [label transformer malli-schema data expected]
+  ([label transformer malli-schema data expected]
   (testing label
     (is (= (malli/decode malli-schema data transformer) expected))))
+  ([label transformer malli-schema data expected reg]
+   (testing label
+     (is (= (malli/decode malli-schema data reg transformer) expected)))))
+
+(defn ^:private assert-validation
+  [label malli-schema data expected]
+  (testing label
+    (is (= (malli/validate malli-schema data) expected))))
 
 (deftest malli-schema-support
   (let [tf (create-transformer mm/malli-config)]
@@ -60,12 +70,34 @@
 
       (assert-decoding ":int -> [:and :int pos?] -> what" tf [:and :int pos?] 123 123)
       (assert-decoding ":int -> [:and :int pos?] -> what" tf [:and :int pos?] "456" 456)
-      (assert-decoding ":int -> [:and :int pos?] -> what" tf [:and pos? :int] -789 -789)  ; muotti doesn't necessarily create valid data, it just forces types
-      (assert-decoding ":int -> [:and :int pos?] -> what" tf [:and pos? :int] 789 789)
-      )
-    (testing "malli.core/predicate-schemas"
+      (assert-decoding ":int -> [:and :int pos?] -> what" tf [:and pos? :int] -789 nil)
+      (assert-decoding ":int -> [:and :int pos?] -> what" tf [:and pos? :int] 789 789))
 
-      ; any?, some?, number?, integer?, int?, pos-int?, neg-int?, nat-int?, pos?, neg?, float?, double?, boolean?, string?, ident?, simple-ident?, qualified-ident?, keyword?, simple-keyword?, qualified-keyword?, symbol?, simple-symbol?, qualified-symbol?, uuid?, uri?, decimal?, inst?, seqable?, indexed?, map?, vector?, list?, seq?, char?, set?, nil?, false?, true?, zero?, rational?, coll?, empty?, associative?, sequential?, ratio?, bytes?, ifn? and fn?
+    (testing "malli.core/predicate-schemas"
+      (let [muotti-registry (mm/extension-types-registry malli/default-registry)
+            with-registry   (fn [schema] (malli/schema schema {:registry muotti-registry}))]
+        (testing "numeric predicates"
+         (testing "extended predicates"
+           (assert-validation "[instance? {:type java.time.Instant}]" (with-registry [instance? {:class Instant}]) (Instant/now) true))
+
+         (testing "extended types"
+           (assert-validation "::big-int" (with-registry ::mm/big-int) 999999999999999999999N true)
+           (assert-validation "::big-integer" (with-registry ::mm/big-integer) (BigInteger. "999999999999999999999") true)
+           (assert-validation "::big-decimal" (with-registry ::mm/big-decimal) 99999999999999999999.9M true)
+           (assert-validation "::big-decimal" (with-registry ::mm/big-decimal) (BigDecimal. "99999999999999999999.9") true)
+
+           (assert-decoding "[:string -> ::big-integer]" tf (with-registry ::mm/big-integer) "999999999999999999999" 999999999999999999999N))
+
+         (testing "type test predicates"
+           (assert-decoding "[:string -> int?]" tf (with-registry int?) "123" 123)
+           (assert-decoding "[:string -> pos?]" tf (with-registry pos?) "123" 123.0)
+           (assert-decoding "[:string -> rational?]" tf (with-registry rational?) "2/3" (/ 2 3)))))
+
+      ; any?, some?, number?, integer?, int?, pos-int?, neg-int?, nat-int?, pos?, neg?, float?, double?,
+      ; boolean?, string?, ident?, simple-ident?, qualified-ident?, keyword?, simple-keyword?, qualified-keyword?,
+      ; symbol?, simple-symbol?, qualified-symbol?, uuid?, uri?, decimal?, inst?, seqable?, indexed?, map?, vector?,
+      ; list?, seq?, char?, set?, nil?, false?, true?, zero?, rational?, coll?, empty?, associative?, sequential?,
+      ; ratio?, bytes?, ifn? and fn?
       )))
 
 (deftest default-values

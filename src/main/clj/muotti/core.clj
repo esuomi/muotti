@@ -1,5 +1,6 @@
 (ns muotti.core
   (:require [loom.alg :as alg]
+            [loom.alg-generic :as alg-generic]
             [loom.attr :as attr]
             [loom.graph :as graph]
             [loom.io :as lio]
@@ -18,16 +19,20 @@
     (apply graph/digraph (keys adjacencies))
     adjacencies))
 
-(defn ^:private resolve-transformer-chain
+(defn ^:private resolve-transformer-chains
   [graph from to]
-  (let [path (alg/bf-path graph from to)]
-    (if (some? path)
+  (let [paths (vec (alg-generic/bf-paths-bi (partial graph/successors graph) (partial graph/predecessors graph) from to))]
+    (if-not (empty? paths)
       (do
-        (log/debugf "Resolved transformation [%s -> %s] as path %s" from to path)
-        (->> (partition 2 1 path)
-             (map (fn [[from to]]
-                    (attr/attrs graph from to)))
-             (filter some?)))
+        (log/debugf "Resolved transformation [%s -> %s] as potential paths %s" from to paths)
+        (mapv
+          (fn [path]
+            (->> (partition 2 1 path)
+                 (map (fn [[from to]]
+                        (attr/attrs graph from to)))
+                 (filterv some?)))
+          paths)
+        )
       (do
         (log/warnf "Transformation [%s -> %s] cannot be resolved with given adjancency list" from to)
         ::unknown-path))))
@@ -64,6 +69,24 @@
 
 ; TODO: logging, better chain debugging, malli walks
 
+(defn ^:private resolve-chain
+  [value chain]
+  (reduce
+    (fn [v {:keys [validator transformer]}]
+      (if (if (some? validator)
+            (validator v)
+            true)
+        (try
+          (transformer v)
+          (catch Exception e
+            (log/warnf e "Value %s cannot be transformed with the user provided transformer %s" v transformer)
+            (reduced ::failed-resolve)))
+        (do
+          (log/warnf "Value %s cannot be validated with the user provided validator %s" v validator)
+          (reduced ::failed-resolve))))
+    value
+    chain))
+
 (defn ->transformer
   "Creates a new [[Transformer]] instance from given map of adjacencies and related configuration. By default uses
   [[default-adjacencies]], but the map of adjacency lists to validation and transformation functions can be overridden.
@@ -84,21 +107,18 @@
    (let [graph (adjacencies-as-graph transformations)]
      (reify Transformer
        (transform [_ from to value]
-         (let [chain (resolve-transformer-chain graph from to)]
-           (if (= ::unknown-path chain)
-             chain
+         (let [chains (resolve-transformer-chains graph from to)]
+           (if (= ::unknown-path chains)
+             chains
              (reduce
-               (fn [v {:keys [validator transformer]}]
-                 (if (if (some? validator)
-                       (validator v)
-                       true)
-                   ; TODO: logging/exception handling for actual transformation
-                   (transformer v)
-                   (do
-                     (log/warnf "Value %s cannot be validated with the user provided validator %s" v validator)
-                     (reduced ::invalid-value))))
-               value
-               chain))))
+               (fn [_ chain]
+                 (println "_ = " _)
+                 (let [result (resolve-chain value chain)]
+                   (if-not (= ::failed-resolve result)
+                     (reduced result)
+                     ::invalid-value)))
+               ::invalid-value
+               chains))))
        (graph-dot [_]
          (lio/dot-str graph))
        (config [_]
