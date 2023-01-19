@@ -140,5 +140,70 @@ The resulting file can be input into [GraphViz](https://graphviz.org/):
 dot -Tpng /tmp/graph.dot > graph.png
 ```
 which results in
-
 ![DOT example output](./docs/images/graph.png)
+
+## [Mermaid Flowchart](https://mermaid.js.org/syntax/flowchart.html) support
+
+For easier embedding the graph can also be converted into a Mermaid Flowchart script:
+```clojure
+(->> (muotti/->transformer mm/malli-config)
+     (muotti/visualize-mermaid)
+```
+This results in a string which can be, for example, put directly into GitHub Markdown file:
+```mermaid
+flowchart TD
+	:qualified-symbol([:qualified-symbol]) --> :string([:string])
+	:qualified-symbol([:qualified-symbol]) --> :any([:any])
+	:double([:double]) --> float?([float?])
+	:double([:double]) --> double?([double?])
+	:double([:double]) --> :string([:string])
+	:double([:double]) --> number?([number?])
+	:double([:double]) --> :any([:any])
+	:muotti.malli/big-integer([:muotti.malli/big-integer]) --> integer?([integer?])
+	:muotti.malli/big-integer([:muotti.malli/big-integer]) --> nat-int?([nat-int?])
+	:muotti.malli/big-integer([:muotti.malli/big-integer]) --> number?([number?])
+	:int([:int]) --> :double([:double])
+	:int([:int]) --> :muotti.malli/big-integer([:muotti.malli/big-integer])
+	:int([:int]) --> int?([int?])
+	:int([:int]) --> :muotti.malli/ratio([:muotti.malli/ratio])
+	:int([:int]) --> :muotti.malli/float([:muotti.malli/float])
+	:int([:int]) --> :string([:string])
+	:int([:int]) --> :muotti.malli/big-decimal([:muotti.malli/big-decimal])
+	:int([:int]) --> integer?([integer?])
+	:int([:int]) --> nat-int?([nat-int?])
+	:int([:int]) --> number?([number?])
+	:int([:int]) --> :any([:any])
+	:symbol([:symbol]) --> :string([:string])
+	:symbol([:symbol]) --> :any([:any])
+	:qualified-keyword([:qualified-keyword]) --> :string([:string])
+	:qualified-keyword([:qualified-keyword]) --> :any([:any])
+	int?([int?]) --> neg-int?([neg-int?])
+	int?([int?]) --> pos-int?([pos-int?])
+	:muotti.malli/ratio([:muotti.malli/ratio]) --> ratio?([ratio?])
+	:muotti.malli/ratio([:muotti.malli/ratio]) --> number?([number?])
+	:muotti.malli/float([:muotti.malli/float]) --> float?([float?])
+	:muotti.malli/float([:muotti.malli/float]) --> number?([number?])
+	:string([:string]) --> :double([:double])
+	:string([:string]) --> :muotti.malli/big-integer([:muotti.malli/big-integer])
+	:string([:string]) --> :int([:int])
+	:string([:string]) --> :symbol([:symbol])
+	:string([:string]) --> :muotti.malli/ratio([:muotti.malli/ratio])
+	:string([:string]) --> :keyword([:keyword])
+	:string([:string]) --> :uuid([:uuid])
+	:string([:string]) --> :boolean([:boolean])
+	:keyword([:keyword]) --> :symbol([:symbol])
+	:keyword([:keyword]) --> :string([:string])
+	:keyword([:keyword]) --> :any([:any])
+	:muotti.malli/big-decimal([:muotti.malli/big-decimal]) --> decimal?([decimal?])
+	:muotti.malli/big-decimal([:muotti.malli/big-decimal]) --> float?([float?])
+	:muotti.malli/big-decimal([:muotti.malli/big-decimal]) --> number?([number?])
+	integer?([integer?]) --> rational?([rational?])
+	ratio?([ratio?]) --> rational?([rational?])
+	:uuid([:uuid]) --> :string([:string])
+	:uuid([:uuid]) --> :any([:any])
+	:boolean([:boolean]) --> :string([:string])
+	:boolean([:boolean]) --> :any([:any])
+	number?([number?]) --> pos?([pos?])
+	number?([number?]) --> neg?([neg?])
+	number?([number?]) --> zero?([zero?])
+```
