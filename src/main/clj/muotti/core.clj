@@ -31,8 +31,7 @@
                  (map (fn [[from to]]
                         (attr/attrs graph from to)))
                  (filterv some?)))
-          paths)
-        )
+          paths))
       (do
         (log/warnf "Transformation [%s -> %s] cannot be resolved with given adjancency list" from to)
         ::unknown-path))))
@@ -85,6 +84,7 @@
     value
     chain))
 
+(def ^:private resolved-paths (atom {}))
 (defn ->transformer
   "Creates a new [[Transformer]] instance from given map of adjacencies and related configuration. By default uses
   [[default-adjacencies]], but the map of adjacency lists to validation and transformation functions can be overridden.
@@ -105,18 +105,26 @@
    (let [graph (adjacencies-as-graph transformations)]
      (reify Transformer
        (transform [_ from to value]
-         (let [chains (resolve-transformer-chains graph from to)]
-           (if (= ::unknown-path chains)
-             chains
-             (reduce
-               (fn [_ chain]
-                 (let [result (resolve-chain value chain)]
-                   (if-not (= ::failed-resolve result)
-                     (reduced result)
-                     ::invalid-value)))
-               ::invalid-value
-               chains))))
+         (if-let [cached-chain (get @resolved-paths [from to])]
+           (do
+             (log/tracef "Reusing cached chain %s for transformation [%s -> %s]" cached-chain from to)
+             (resolve-chain value cached-chain))
+           (let [chains (resolve-transformer-chains graph from to)]
+             (if (= ::unknown-path chains)
+               chains
+               (reduce
+                 (fn [_ chain]
+                   (let [result (resolve-chain value chain)]
+                     (if-not (= ::failed-resolve result)
+                       (do
+                         (log/debugf "Path %s produces usable result for transformation [%s -> %s], caching path for future lookups" chain from to)
+                         (swap! resolved-paths assoc [from to] chain)
+                         (reduced result))
+                       ::invalid-value)))
+                 ::invalid-value
+                 chains)))))
        (visualize-dot [_]
          (lio/dot-str graph))
        (config [_]
          config)))))
+
