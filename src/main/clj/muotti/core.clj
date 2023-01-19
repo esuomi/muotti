@@ -63,6 +63,8 @@
     If value cannot be transformed with the resolved chain, special value `::invalid-value` is returned.")
   (visualize-dot [this]
     "Render the contained graph out as DOT document. Returns the result as string.")
+  (visualize-mermaid [this]
+    "Render the contained graph out as Mermaid Flowchart. Returns the result as string.")
   (config [this]
     "Return the original configuration this transformer was created with."))
 
@@ -84,6 +86,14 @@
     value
     chain))
 
+(defn ^:private ->mermaid
+  [graph]
+  (->> (graph/edges graph)
+       (reduce
+         (fn [[index content] [from to]]
+           [(inc index) (str content "\n\t" from "([" from "]) --> "to"([" to "])")])
+         [0 "flowchart TD"])
+       second))
 (def ^:private resolved-paths (atom {}))
 (defn ->transformer
   "Creates a new [[Transformer]] instance from given map of adjacencies and related configuration. By default uses
@@ -125,6 +135,8 @@
                  chains)))))
        (visualize-dot [_]
          (lio/dot-str graph))
+       (visualize-mermaid [_]
+         (->mermaid graph))
        (config [_]
          config)))))
 
