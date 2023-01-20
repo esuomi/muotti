@@ -58,5 +58,5 @@
   :repl-options {:init-ns muotti.dev}
 
   :git-revisions {:format        :semver
-                  :adjust        [:env/project_revision_adjustment :minor]
+                  :adjust        [:env/revisionsupda_adjustment :minor]
                   :revision-file "src/main/resources/metadata.edn"})
