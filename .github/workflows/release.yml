@@ -32,7 +32,7 @@ jobs:
           lein: latest
 
       - name: Inject revision increment adjustment
-        run: echo "REVISION_ADJUSTMENT=${{ github.event.inputs.adjustment }}" >> $GITHUB_ENV
+        run: echo "REVISIONS_ADJUSTMENT=${{ github.event.inputs.adjustment }}" >> $GITHUB_ENV
 
       - name: Deploy to Clojars
         run: lein deploy clojars
