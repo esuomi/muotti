@@ -27,7 +27,7 @@ jobs:
 
       # eventually this will have something better, for now this is fine
       - name: Detect revision increment adjustment
-        run: echo "LEIN_REVISIONS_ADJUSTMENTS=patch" >> $GITHUB_ENV
+        run: echo "REVISIONS_ADJUSTMENT=patch" >> $GITHUB_ENV
 
       - name: Deploy to Clojars
         run: lein deploy clojars

@@ -8,7 +8,7 @@ on:
         default: 'minor'
 
 env:
-  LEIN_REVISIONS_RELEASE: true
+  REVISIONS_RELEASE: true
 
 jobs:
   release:
@@ -32,7 +32,7 @@ jobs:
           lein: latest
 
       - name: Inject revision increment adjustment
-        run: echo "LEIN_REVISIONS_ADJUSTMENTS=${{ github.event.inputs.adjustment }}" >> $GITHUB_ENV
+        run: echo "REVISION_ADJUSTMENT=${{ github.event.inputs.adjustment }}" >> $GITHUB_ENV
 
       - name: Deploy to Clojars
         run: lein deploy clojars
