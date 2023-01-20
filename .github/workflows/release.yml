@@ -42,7 +42,7 @@ jobs:
 
       - name: Extract version
         id: version
-        run: echo "::set-output name=version::$(lein pprint :version | tr -d '\"')"
+        run: echo "version=$(lein pprint :version | tr -d '\"')" >> $GITHUB_OUTPUT
 
       - name: Create tag
         uses: actions/github-script@v6
