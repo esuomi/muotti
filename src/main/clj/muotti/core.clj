@@ -94,7 +94,7 @@
            [(inc index) (str content "\n\t" from "([" from "]) --> "to"([" to "])")])
          [0 "flowchart TD"])
        second))
-(def ^:private resolved-paths (atom {}))
+
 (defn ->transformer
   "Creates a new [[Transformer]] instance from given map of adjacencies and related configuration. By default uses
   [[default-adjacencies]], but the map of adjacency lists to validation and transformation functions can be overridden.
@@ -112,7 +112,8 @@
   ([] ->transformer default-config)
   ([{:keys [transformations]
      :as   config}]
-   (let [graph (adjacencies-as-graph transformations)]
+   (let [resolved-paths (atom {})
+         graph          (adjacencies-as-graph transformations)]
      (reify Transformer
        (transform [_ from to value]
          (if-let [cached-chain (get @resolved-paths [from to])]
