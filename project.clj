@@ -3,8 +3,11 @@
                 a digraph of known transformations to produce a transformer chain which is then used to perform the
                 actual transformation."
   :url "https://github.com/esuomi/muotti"
-  :license {:name "EPL-2.0 OR GPL-2.0-or-later WITH Classpath-exception-2.0"
-            :url  "https://www.eclipse.org/legal/epl-2.0/"}
+  :license {:name "MIT"
+            :url  "https://choosealicense.com/licenses/mit"
+            :comment "MIT License"
+            :year 2023
+            :key "mit"}
 
   :dependencies [[org.clojure/clojure "1.11.0"]
 
