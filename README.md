@@ -18,6 +18,10 @@ Muotti is a graph based value transformer library which aims
 to solve value transformation by utilizing a [digraph](https://en.wikipedia.org/wiki/Directed_graph) of known
 transformations to produce a _transformer chain_ which is then used to perform the actual transformation.
 
+
+> # Archival note
+> This library is no longer maintained, but remains functional. Its latest published version can be considered feature complete and has proven to be stable. If you need to modify the library in any way, do consider [forking](https://github.com/esuomi/muotti/fork).
+
 # Usage
 
 Given a map of adjacencies - that is, edges of a graph - with validation and transformer functions:
